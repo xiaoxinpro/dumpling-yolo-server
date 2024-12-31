@@ -94,29 +94,45 @@
                     dots = 1;
                 }
             }, 300);
-
+    
             return interval;
         }
-
+    
         function stopLoading(interval) {
             clearInterval(interval);
             document.getElementById('loadingText').textContent = '';
         }
-
+    
         document.addEventListener('DOMContentLoaded', () => {
             const form = document.getElementById('detectionForm');
             const button = document.getElementById('detectButton');
-            form.addEventListener('submit', () => {
+            form.addEventListener('submit', (event) => {
+                event.preventDefault(); // 阻止默认的表单提交行为
                 button.disabled = true;
                 const loadingInterval = startLoading();
-                form.addEventListener('load', () => {
+    
+                const formData = new FormData(form);
+                fetch('/detect', {
+                    method: 'POST',
+                    body: formData
+                })
+                .then(response => {
                     stopLoading(loadingInterval);
                     button.disabled = false;
-                }, { once: true });
-                form.addEventListener('error', () => {
-                    stopLoading(loadingInterval);
-                    button.disabled = false;
-                }, { once: true });
+                    if (!response.ok) {
+                        return response.text().then(text => { throw new Error(text) });
+                    }
+                    return response.text();
+                })
+                .then(html => {
+                    const parser = new DOMParser();
+                    const doc = parser.parseFromString(html, 'text/html');
+                    const resultDiv = doc.getElementById('result').innerHTML;
+                    document.getElementById('result').innerHTML = resultDiv;
+                })
+                .catch(error => {
+                    document.getElementById('result').innerHTML = `<h2>检测结果:</h2><pre>${error.message}</pre>`;
+                });
             });
         });
     </script>
