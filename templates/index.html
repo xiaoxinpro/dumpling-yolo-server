@@ -13,7 +13,7 @@
         }
         .container {
             max-width: 800px;
-            margin: 50px auto;
+            margin: 20px auto;
             padding: 20px;
             background-color: #fff;
             box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
@@ -22,6 +22,7 @@
         h1 {
             text-align: center;
             color: #333;
+            font-size: 24px;
         }
         form {
             display: flex;
@@ -33,6 +34,9 @@
             padding: 10px;
             border: 1px solid #ccc;
             border-radius: 4px;
+            width: 100%;
+            max-width: 300px;
+            box-sizing: border-box;
         }
         button {
             padding: 10px 20px;
@@ -41,6 +45,9 @@
             border: none;
             border-radius: 4px;
             cursor: pointer;
+            width: 100%;
+            max-width: 300px;
+            font-size: 16px;
         }
         button:hover {
             background-color: #0056b3;
@@ -55,6 +62,7 @@
             background-color: #f9f9f9;
             border: 1px solid #ddd;
             border-radius: 4px;
+            font-size: 14px;
         }
         pre {
             white-space: pre-wrap;
@@ -63,6 +71,12 @@
             padding: 10px;
             border: 1px solid #ddd;
             border-radius: 4px;
+            font-size: 14px;
+        }
+        #loadingText {
+            margin-top: 20px;
+            text-align: center;
+            font-size: 16px;
         }
     </style>
 </head>
@@ -71,9 +85,9 @@
         <h1>饺子数量检测服务</h1>
         <form id="detectionForm" action="/detect" method="post" enctype="multipart/form-data">
             <input type="file" name="image" accept="image/*" required>
-            <button type="submit" id="detectButton">检测饺子</button>
+            <button type="submit" id="detectButton">检测饺子数量</button>
         </form>
-        <div id="loadingText" style="margin-top: 20px;"></div>
+        <div id="loadingText"></div>
         <div id="result">
             {% if result %}
                 <h2>检测结果:</h2>
@@ -94,15 +108,15 @@
                     dots = 1;
                 }
             }, 300);
-    
+
             return interval;
         }
-    
+
         function stopLoading(interval) {
             clearInterval(interval);
             document.getElementById('loadingText').textContent = '';
         }
-    
+
         document.addEventListener('DOMContentLoaded', () => {
             const form = document.getElementById('detectionForm');
             const button = document.getElementById('detectButton');
@@ -110,7 +124,7 @@
                 event.preventDefault(); // 阻止默认的表单提交行为
                 button.disabled = true;
                 const loadingInterval = startLoading();
-    
+
                 const formData = new FormData(form);
                 fetch('/detect', {
                     method: 'POST',
