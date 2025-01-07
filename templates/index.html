@@ -53,9 +53,13 @@
             width: 100%;
             max-width: 300px;
             font-size: 16px;
+            transition: background-color 0.3s ease; /* 添加过渡效果 */
         }
         button:hover {
             background-color: #0056b3;
+        }
+        button:active {
+            background-color: #007BFF; /* 确保点击时颜色不变 */
         }
         button:disabled {
             background-color: #ccc;
@@ -128,6 +132,7 @@
             form.addEventListener('submit', (event) => {
                 event.preventDefault(); // 阻止默认的表单提交行为
                 button.disabled = true;
+                button.style.backgroundColor = '#ccc'; // 禁用时设置按钮颜色
                 const loadingInterval = startLoading();
 
                 const formData = new FormData(form);
@@ -138,6 +143,7 @@
                 .then(response => {
                     stopLoading(loadingInterval);
                     button.disabled = false;
+                    button.style.backgroundColor = '#007BFF'; // 恢复按钮颜色
                     if (!response.ok) {
                         return response.text().then(text => { throw new Error(text) });
                     }
