@@ -2,6 +2,7 @@ from flask import Flask, request, render_template, send_from_directory
 from PIL import Image
 import io
 from ultralytics import YOLO
+import hashlib
 import os
 
 app = Flask(__name__)
@@ -11,6 +12,9 @@ model = YOLO("model.pt")
 
 # 设置静态文件目录
 STATIC_DIR = os.path.join(os.path.dirname(__file__), 'static')
+
+# 设置缓存目录
+CACHES_DIR = os.path.join(os.path.dirname(__file__), 'caches')
 
 @app.route('/')
 def index():
@@ -27,6 +31,22 @@ def detect():
         # 读取上传的图片
         image_bytes = file.read()
         image = Image.open(io.BytesIO(image_bytes))
+
+        # 计算图片的 hash 值
+        image_hash = hashlib.sha256(image_bytes).hexdigest()
+        image_filename = f"{image_hash}.jpg"
+
+        # 创建 caches 文件夹（如果不存在）
+        if not os.path.exists(CACHES_DIR):
+            os.makedirs(CACHES_DIR)
+
+        # 构建图片的完整路径
+        image_path = os.path.join(CACHES_DIR, image_filename)
+
+        # 检查文件是否存在，如果不存在则保存图片
+        if not os.path.exists(image_path):
+            with open(image_path, 'wb') as f:
+                f.write(image_bytes)
 
         # 进行对象检测
         current_results = model.predict(image)
