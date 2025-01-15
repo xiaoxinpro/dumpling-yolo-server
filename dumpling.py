@@ -3,6 +3,7 @@ from PIL import Image
 import io
 from ultralytics import YOLO
 import hashlib
+import json
 import os
 
 app = Flask(__name__)
@@ -55,6 +56,19 @@ def detect():
         # 获取检测结果
         object_count = len(det_info)
         object_info = f"识别到饺子数量：{object_count}个\n"
+
+        # 将检测结果转换为 JSON 格式
+        results_json = current_results[0].boxes.data.tolist()  # 假设 boxes.data 是可以转换为列表的
+        results_json = json.dumps(results_json, indent=2)
+
+        # 构建 JSON 文件的完整路径
+        json_filename = f"{image_hash}.json"
+        json_path = os.path.join(CACHES_DIR, json_filename)
+
+        # 检查 JSON 文件是否存在，如果不存在则保存
+        if not os.path.exists(json_path):
+            with open(json_path, 'w') as json_file:
+                json_file.write(results_json)
 
         # 返回结果
         return render_template('index.html', result=object_info)
