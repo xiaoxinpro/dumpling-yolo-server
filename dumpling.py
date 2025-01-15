@@ -50,7 +50,7 @@ def detect():
                 f.write(image_bytes)
 
         # 进行对象检测
-        current_results = model.predict(image)
+        current_results = model.predict(source=image, conf=0.6, max_det=1000)
         det_info = current_results[0].boxes.cls
 
         # 获取检测结果
