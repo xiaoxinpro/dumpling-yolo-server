@@ -18,10 +18,12 @@ STATIC_DIR = os.path.join(os.path.dirname(__file__), 'static')
 CACHES_DIR = os.path.join(os.path.dirname(__file__), 'caches')
 
 # 检测结果转成json输出
-def detect_result_json(boxes):
-    # 将检测结果转换为 JSON 格式
-    results_json = boxes.data.tolist()  # 假设 boxes.data 是可以转换为列表的
-    return json.dumps(results_json, indent=2)
+def detect_result_json(results):
+    if len(results) > 0:
+        # 将检测结果转换为 JSON 格式
+        return results[0].to_json()
+    else:
+        return json.dumps({"error": "No detect result"}, indent=None)
 
 # 图片检测函数
 def detect(image_bytes):
@@ -45,10 +47,9 @@ def detect(image_bytes):
 
     # 进行对象检测
     current_results = model.predict(source=image, conf=0.6, max_det=1000)
-    result = current_results[0].boxes
 
     # 将检测结果转换为 JSON 格式
-    results_json = detect_result_json(result)
+    results_json = detect_result_json(current_results)
 
     # 构建 JSON 文件的完整路径
     json_filename = f"{image_hash}.json"
@@ -60,7 +61,7 @@ def detect(image_bytes):
             json_file.write(results_json)
 
     # 返回结果BOXES
-    return result
+    return current_results
 
 @app.route('/')
 def web_index():
@@ -78,14 +79,36 @@ def web_detect():
         image_bytes = file.read()
 
         # 检测结果
-        boxes = detect(image_bytes)
+        results = detect(image_bytes)
 
         # 获取检测结果
-        object_count = len(boxes.cls)
+        object_count = 0
+        if len(results) > 0:
+            object_count = len(results[0].boxes.cls)
         object_info = f"识别到饺子数量：{object_count}个\n"
 
         # 返回结果
         return render_template('index.html', result=object_info)
+
+@app.route('/detect/json', methods=['POST'])
+def web_detect_json():
+    if 'image' not in request.files:
+        return {"error": "No image part"}, 400
+    file = request.files['image']
+    if file.filename == '':
+        return {"error": "No selected file"}, 400
+    if file:
+        # 读取上传的图片
+        image_bytes = file.read()
+
+        # 检测结果
+        results = detect(image_bytes)
+
+        # 将检测结果转换为 JSON 格式
+        results_json = detect_result_json(results)
+
+        # 返回 JSON 格式的检测结果
+        return results_json, 200, {'Content-Type': 'application/json'}
 
 # 提供 manifest.json 文件
 @app.route('/manifest.json')
