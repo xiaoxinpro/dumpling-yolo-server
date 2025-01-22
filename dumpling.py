@@ -18,11 +18,11 @@ STATIC_DIR = os.path.join(os.path.dirname(__file__), 'static')
 CACHES_DIR = os.path.join(os.path.dirname(__file__), 'caches')
 
 @app.route('/')
-def index():
+def web_index():
     return render_template('index.html', result=None)
 
 @app.route('/detect', methods=['POST'])
-def detect():
+def web_detect():
     if 'image' not in request.files:
         return "No image part", 400
     file = request.files['image']
@@ -75,12 +75,12 @@ def detect():
 
 # 提供 manifest.json 文件
 @app.route('/manifest.json')
-def serve_manifest():
+def web_serve_manifest():
     return send_from_directory(STATIC_DIR, 'manifest.json')
 
 # 提供 icons 目录下的文件
 @app.route('/icons/<path:filename>')
-def serve_icon(filename):
+def web_serve_icon(filename):
     return send_from_directory(os.path.join(STATIC_DIR, 'icons'), filename)
 
 if __name__ == '__main__':
