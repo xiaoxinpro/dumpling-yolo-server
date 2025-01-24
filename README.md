@@ -6,6 +6,8 @@
 
 > 开源地址：https://github.com/xiaoxinpro/dumpling-yolo-server
 
+![](https://image.xiaoxin.pro/2025/01/24/1144d8bbfa2c9.jpg)
+
 ## 功能特点
 
 - 用户可以上传任意格式的图片文件。
