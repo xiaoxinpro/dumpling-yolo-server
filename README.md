@@ -6,7 +6,7 @@
 
 > 开源地址：https://github.com/xiaoxinpro/dumpling-yolo-server
 
-![](https://image.xiaoxin.pro/2025/01/24/1144d8bbfa2c9.jpg)
+> 微信小程序项目：https://github.com/xiaoxinpro/dumpling-yolo-wechat
 
 ## 功能特点
 
@@ -56,6 +56,16 @@ python dumpling.py
 访问首页，点击“选择文件”按钮上传一张包含饺子的图片。
 点击“检测饺子”按钮，系统将开始处理图片并显示检测进度。
 检测完成后，页面会显示识别到的饺子数量。
+
+## 环境变量说明
+
+通过添加以下环境变量，实现控制对应的软件功能。
+
+| 环境变量              | 默认值 | 备注                      |
+|-------------------|-----|-------------------------|
+| WEB_AUTH_ENABLE   | 0   | 0：关闭Web认证鉴权，1：开启Web认证鉴权 |
+| WEB_AUTH_USERNAME |     | Web认证用户名                |
+| WEB_AUTH_PASSWORD |     | Web认证密码                 |
 
 ## 注意事项
 请确保上传的图片中包含清晰可见的饺子，以便获得更准确的检测结果。

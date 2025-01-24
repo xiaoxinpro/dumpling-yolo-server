@@ -1,4 +1,4 @@
-from flask import Flask, request, render_template, send_from_directory
+from flask import Flask, request, render_template, send_from_directory, Response
 from PIL import Image
 import io
 from ultralytics import YOLO
@@ -62,6 +62,29 @@ def detect(image_bytes):
 
     # 返回结果BOXES
     return current_results
+
+def web_auth_check(username, password):
+    """检查用户名和密码是否正确"""
+    return username == os.environ.get('WEB_AUTH_USERNAME') and password == os.environ.get('WEB_AUTH_PASSWORD')
+
+def web_authenticate():
+    """发送认证请求"""
+    return Response(
+    'Could not verify your access level for that URL.\n'
+    'You have to login with proper credentials', 401,
+    {'WWW-Authenticate': 'Basic realm="Login Required"'})
+
+def is_web_auth_enabled():
+    """检查是否启用身份验证"""
+    return os.environ.get('WEB_AUTH_ENABLE', '0') == '1'
+
+@app.before_request
+def web_before_request():
+    """在请求处理之前进行身份验证"""
+    if is_web_auth_enabled() and request.path in ('/', '/detect'):
+        auth = request.authorization
+        if not auth or not web_auth_check(auth.username, auth.password):
+            return web_authenticate()
 
 @app.route('/')
 def web_index():
